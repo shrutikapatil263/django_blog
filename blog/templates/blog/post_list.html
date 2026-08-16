@@ -1,0 +1,53 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Field Notes &mdash; All Entries{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <p class="eyebrow">Volume 01</p>
+        <h1>Every entry, in order.</h1>
+        <p class="hero-lede">Notes, write-ups, and half-finished thoughts &mdash; posted as they're written, oldest last.</p>
+    </section>
+
+    {% if posts %}
+        <ol class="entry-list">
+            {% for post in posts %}
+                <li class="entry">
+                    <div class="entry-marker" aria-hidden="true">{{ forloop.counter0|add:page_obj.start_index }}</div>
+                    <div class="entry-body">
+                        <h2 class="entry-title">
+                            <a href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a>
+                        </h2>
+                        <p class="entry-meta">
+                            <span class="entry-author">{{ post.author.get_full_name|default:post.author.username }}</span>
+                            <span class="entry-dot">&middot;</span>
+                            <time datetime="{{ post.published_date|date:'c' }}">{{ post.published_date|date:'N j, Y' }}</time>
+                            <span class="entry-dot">&middot;</span>
+                            <span>{{ post.comment_count }} comment{{ post.comment_count|pluralize }}</span>
+                        </p>
+                        <p class="entry-excerpt">{{ post.content|truncatewords:35 }}</p>
+                        <a class="entry-link" href="{% url 'blog:post_detail' post.slug %}">Read entry &rarr;</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ol>
+
+        {% if page_obj.has_other_pages %}
+            <nav class="pagination" aria-label="Pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}">&larr; Newer</a>
+                {% endif %}
+                <span class="pagination-status">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Older &rarr;</a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <h2>Nothing's been written yet.</h2>
+            <p>The first entry is always the hardest one. Log in and start it.</p>
+            <a class="button" href="{% url 'admin:login' %}?next={% url 'blog:post_create' %}">Log in to write</a>
+        </div>
+    {% endif %}
+{% endblock %}

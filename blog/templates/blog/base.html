@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Field Notes{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="wrap header-inner">
+            <a class="brand" href="{% url 'blog:post_list' %}">
+                <span class="brand-mark">FN</span>
+                <span class="brand-text">
+                    <span class="brand-title">Field Notes</span>
+                    <span class="brand-sub">a small blog, kept plainly</span>
+                </span>
+            </a>
+            <nav class="site-nav">
+                <a href="{% url 'blog:post_list' %}">All entries</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'blog:post_create' %}" class="nav-cta">New entry</a>
+                    <a href="{% url 'admin:logout' %}">Log out ({{ user.username }})</a>
+                {% else %}
+                    <a href="{% url 'admin:login' %}?next={% url 'blog:post_create' %}">Log in to write</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap page">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="message {{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap">
+            <p>Field Notes &mdash; a Django blog built for Week 1's project brief.</p>
+        </div>
+    </footer>
+</body>
+</html>

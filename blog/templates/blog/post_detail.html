@@ -1,0 +1,67 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ post.title }} &mdash; Field Notes{% endblock %}
+
+{% block content %}
+    <article class="post">
+        <a class="back-link" href="{% url 'blog:post_list' %}">&larr; All entries</a>
+
+        <header class="post-header">
+            <h1>{{ post.title }}</h1>
+            <p class="post-meta">
+                By <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                <span class="entry-dot">&middot;</span>
+                <time datetime="{{ post.published_date|date:'c' }}">{{ post.published_date|date:'N j, Y, g:i A' }}</time>
+                {% if post.updated_date != post.published_date %}
+                    <span class="entry-dot">&middot;</span>
+                    <span class="edited-tag">edited {{ post.updated_date|date:'N j, Y' }}</span>
+                {% endif %}
+            </p>
+        </header>
+
+        <div class="post-content">
+            {{ post.content|linebreaks }}
+        </div>
+    </article>
+
+    <section class="comments" id="comments">
+        <h2>{{ comments.count }} Comment{{ comments.count|pluralize }}</h2>
+
+        {% if comments %}
+            <ul class="comment-list">
+                {% for comment in comments %}
+                    <li class="comment">
+                        <div class="comment-avatar" aria-hidden="true">{{ comment.author_name|slice:":1"|upper }}</div>
+                        <div class="comment-body">
+                            <p class="comment-meta">
+                                <strong>{{ comment.author_name }}</strong>
+                                <span class="entry-dot">&middot;</span>
+                                <time datetime="{{ comment.created_date|date:'c' }}">{{ comment.created_date|date:'N j, Y, g:i A' }}</time>
+                            </p>
+                            <p class="comment-text">{{ comment.content|linebreaksbr }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-comments">No comments yet &mdash; be the first to leave one.</p>
+        {% endif %}
+
+        <div class="comment-form-wrap">
+            <h3>Leave a comment</h3>
+            <form method="post" action="{% url 'blog:post_detail' post.slug %}#comments">
+                {% csrf_token %}
+                {% for field in comment_form %}
+                    <div class="form-field">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="field-error">{{ field.errors|striptags }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="button">Post comment</button>
+            </form>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}New Entry &mdash; Field Notes{% endblock %}
+
+{% block content %}
+    <section class="hero hero-compact">
+        <p class="eyebrow">New entry</p>
+        <h1>Write something down.</h1>
+        <p class="hero-lede">Posting as <strong>{{ user.username }}</strong>.</p>
+    </section>
+
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="field-help">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                    <p class="field-error">{{ field.errors|striptags }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <div class="form-actions">
+            <a class="button button-ghost" href="{% url 'blog:post_list' %}">Cancel</a>
+            <button type="submit" class="button">Publish entry</button>
+        </div>
+    </form>
+{% endblock %}
